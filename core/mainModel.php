@@ -39,6 +39,35 @@
 			return $sql;
 		}
 
+		protected function guardar_bitacora($datos){
+			$sql=self::conectar()->prepare("INSERT INTO bitacora(BitacoraCodigo,BitacoraFecha,BitacoraHoraInicio,BitacoraHoraFinal,BitacoraTipo,BitacoraYear,CuentaCodigo) 
+				VALUES(:Codigo,:Fecha,:HoraInicio,:HoraFinal,:Tipo,:Year,:Cuenta)");
+			$sql->bindParam(":Codigo",$datos['Codigo']);
+			$sql->bindParam(":Fecha",$datos['Fecha']);
+			$sql->bindParam(":HoraInicio",$datos['HoraInicio']);
+			$sql->bindParam(":HoraFinal",$datos['HoraFinal']);
+			$sql->bindParam(":Tipo",$datos['Tipo']);
+			$sql->bindParam(":Year",$datos['Year']);
+			$sql->bindParam(":Cuenta",$datos['Cuenta']);
+			$sql->execute();
+			return $sql;
+		}
+
+		protected function actualizar_bitacora($codigo,$hora){
+			$sql=self::conectar()->prepare("UPDATE bitacora SET BitacoraHoraFinal=:Hora WHERE CuentaCodigo=:Codigo");
+			$sql->bindParam(":Cuenta",$hora);
+			$sql->bindParam(":Codigo",$codigo);
+			$sql->execute();
+			return $sql;
+		}
+
+		protected function eliminar_bitacora($codigo){
+			$sql=self::conectar()->prepare("DELETE FROM bitacora WHERE CuentaCodigo=:Codigo");
+			$sql->bindParam(":Codigo",$codigo);
+			$sql->execute();
+			return $sql;
+		}
+
 		public static function encryption($string){
 			$output=FALSE;
 			$key=hash('sha256', SECRET_KEY);
