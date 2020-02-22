@@ -11,7 +11,7 @@
 	<?php 
 		require_once "./controladores/vistasControlador.php";
 		$vt = new vistasControlador();
-		$vistasR=$vt->obtener_plantilla_controlador();
+		$vistasR=$vt->obtener_vistas_controlador();
 
 		if ($vistasR=="login"):
 			require_once "./vistas/contenidos/login-view.php";
