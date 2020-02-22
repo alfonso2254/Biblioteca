@@ -13,7 +13,7 @@
 	  		</a>
 	  	</li>
 	  	<li>
-	  		<a href="<?php echo SERVERURL; ?>company-list/" class="btn btn-success">
+	  		<a href="<?php echo SERVERURL; ?>companylist/" class="btn btn-success">
 	  			<i class="zmdi zmdi-format-list-bulleted"></i> &nbsp; LISTA DE EMPRESAS
 	  		</a>
 	  	</li>
