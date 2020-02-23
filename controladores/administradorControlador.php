@@ -6,6 +6,8 @@
 	}
 
 	class administradorControlador extends administradorModelo{
+
+		//Controlador para agregar administrador
 		public function agregar_administrador_controlador(){
 			$dni=mainModel::limpiar_cadena($_POST['dni-reg']);
 			$nombre=mainModel::limpiar_cadena($_POST['nombre-reg']);
@@ -136,6 +138,95 @@
 			}
 			return mainModel::sweet_alert($alerta);	
 			
+		}
+
+		//Controlador para paginar adminiistradores
+
+		public function paginador_administrador_controlador($pagina,$registros,$privilegios,$codigo){
+
+			$pagina=mainModel::limpiar_cadena($pagina);
+			$registros=mainModel::limpiar_cadena($registros);
+			$privilegios=mainModel::limpiar_cadena($privilegios);
+			$codigo=mainModel::limpiar_cadena($codigo);
+			$tabla="";
+
+			$pagina= (isset($pagina) && $pagina>0) ? (int) $pagina :1;
+			$inicio= ($pagina>0) ? (($pagina*$registros)-$registros): 0;
+
+			$conexion = mainModel::conectar();
+
+			$datos = $conexion->query("
+				SELECT SQL_CALC_FOUND_ROWS * FROM admin WHERE CuentaCodigo!='$codigo' AND id!='1' ORDER BY AdminNombre ASC LIMIT $inicio,$registros
+				");
+			$datos = $datos->fetchAll();
+
+			$total =$conexion->query("SELECT FOUND_ROWS()");
+			$total = (int) $total->fetchColumn();
+
+			$Npaginas= ceil($total/$registros);
+
+
+			$tabla.= '
+			<div class="table-responsive">
+				<table class="table table-hover text-center">
+					<thead>
+						<tr>
+							<th class="text-center">#</th>
+							<th class="text-center">DNI</th>
+							<th class="text-center">NOMBRES</th>
+							<th class="text-center">APELLIDOS</th>
+							<th class="text-center">TELÉFONO</th>
+							<th class="text-center">A. CUENTA</th>
+							<th class="text-center">A. DATOS</th>
+							<th class="text-center">ELIMINAR</th>
+						</tr>
+					</thead>
+					<tbody>
+			';
+
+			if ($total>=1 && $pagina<=$Npaginas) {
+				$contador= $inicio+1;
+				foreach ($datos as $rows) {
+					$tabla.= '
+					<tr>
+						<td>'.$contador.'</td>
+						<td>'.$rows['AdminDNI'] .'</td>
+						<td>'.$rows['AdminNombre'] .'</td>
+						<td>'.$rows['AdminApellido'] .'</td>
+						<td>'.$rows['AdminTelefono'] .'</td>
+						<td>
+							<a href="#!" class="btn btn-success btn-raised btn-xs">
+								<i class="zmdi zmdi-refresh"></i>
+							</a>
+						</td>
+						<td>
+							<a href="#!" class="btn btn-success btn-raised btn-xs">
+								<i class="zmdi zmdi-refresh"></i>
+							</a>
+						</td>
+						<td>
+							<form>
+								<button type="submit" class="btn btn-danger btn-raised btn-xs">
+									<i class="zmdi zmdi-delete"></i>
+								</button>
+							</form>
+						</td>
+					</tr>
+				';
+				$contador++;
+				}
+			} else {
+				$tabla.= '
+					<tr colspan="5">
+						<td>No hay registros en el sistema</td>
+					</tr>
+				';
+			}
+			
+
+			$tabla.= '</tbody></table></div>';
+
+			return $tabla;
 		}
 	}
 	

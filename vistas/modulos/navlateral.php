@@ -3,7 +3,7 @@
 		<div class="full-box dashboard-sideBar-ct">
 			<!--SideBar Title -->
 			<div class="full-box text-uppercase text-center text-titles dashboard-sideBar-title">
-				<a href="<?php echo SERVERURL; ?>home/" ><?php echo COMPANY; ?></a>
+				<?php echo COMPANY; ?>
 				 <i class="zmdi zmdi-close btn-menu-dashboard visible-xs"></i>
 			</div>
 			<!-- SideBar User info -->
