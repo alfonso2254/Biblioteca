@@ -54,8 +54,8 @@
 		}
 
 		protected function actualizar_bitacora($codigo,$hora){
-			$sql=self::conectar()->prepare("UPDATE bitacora SET BitacoraHoraFinal=:Hora WHERE CuentaCodigo=:Codigo");
-			$sql->bindParam(":Cuenta",$hora);
+			$sql=self::conectar()->prepare("UPDATE bitacora SET BitacoraHoraFinal=:Hora WHERE BitacoraCodigo=:Codigo");
+			$sql->bindParam(":Hora",$hora);
 			$sql->bindParam(":Codigo",$codigo);
 			$sql->execute();
 			return $sql;

@@ -3,7 +3,8 @@
 		<div class="full-box dashboard-sideBar-ct">
 			<!--SideBar Title -->
 			<div class="full-box text-uppercase text-center text-titles dashboard-sideBar-title">
-				<?php echo COMPANY; ?> <i class="zmdi zmdi-close btn-menu-dashboard visible-xs"></i>
+				<a href="<?php echo SERVERURL; ?>home/" ><?php echo COMPANY; ?></a>
+				 <i class="zmdi zmdi-close btn-menu-dashboard visible-xs"></i>
 			</div>
 			<!-- SideBar User info -->
 			<div class="full-box dashboard-sideBar-UserInfo">
@@ -23,7 +24,7 @@
 						</a>
 					</li>
 					<li>
-						<a href="#!" title="Salir del sistema" class="btn-exit-system">
+						<a href="<?php echo $lc->encryption($_SESSION['token_sbp']); ?>" title="Salir del sistema" class="btn-exit-system">
 							<i class="zmdi zmdi-power"></i>
 						</a>
 					</li>

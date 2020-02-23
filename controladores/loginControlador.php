@@ -84,4 +84,23 @@
 			}
 			
 		}
+
+		public function cerrar_session_controlador(){
+			session_start(['name'=>'SBP']);
+			$token=mainModel::decryption($_GET['Token']);
+			$hora=date("h:i:s a");
+			$datos=[
+				"Usuario"=>$_SESSION['usuario_sbp'],
+				"Token_S"=>$_SESSION['token_sbp'],
+				"Token"=>$token,
+				"Codigo"=>$_SESSION['codigo_bitacora_sbp'],
+				"Hora"=>"$hora"
+			];
+			return loginModelo::cerrar_session_modelo($datos);
+		}
+
+		public function forzar_cierre_session_controlador(){
+			session_destroy();
+			return header("Location:".SERVERURL."login/");
+		}
 	}

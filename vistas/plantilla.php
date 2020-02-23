@@ -26,6 +26,14 @@
 			
 		else :
 			session_start(['name'=>'SBP']);
+
+			require_once "./controladores/loginControlador.php";
+
+			$lc= new loginControlador();
+			if (!isset($_SESSION['token_sbp']) || !isset($_SESSION['usuario_sbp'])) {
+				$lc->forzar_cierre_session_controlador();
+			} 
+			
 		
 	 ?>
 	<!-- SideBar -->
@@ -39,8 +47,13 @@
 
 
 	</section>
-	<?php endif ?>
+	<?php 
+		include "./vistas/modulos/logoutScript.php";
+	 endif ?>
 
+	<script>
+		$.material.init();
+	</script>
 	
 </body>
 </html>
