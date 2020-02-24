@@ -18,4 +18,10 @@
 			$sql->execute();
 			return $sql;
 		}
+		protected function eliminar_administrador_modelo($codigo){
+			$query=mainModel::conectar()->prepare("DELETE FROM admin where CuentaCodigo=:Codigo");
+			$query->bindParam(":Codigo",$codigo);
+			$query->execute();
+			return $query;
+		}
 	}

@@ -40,7 +40,7 @@
 		    				<div class="col-xs-12">
 						    	<div class="form-group label-floating">
 								  	<label class="control-label">DNI/CEDULA *</label>
-								  	<input pattern="[0-9-]{1,30}" class="form-control" type="text" name="dni-reg" required="" maxlength="30">
+								  	<input  pattern="[0-9-]{1,30}" class="form-control" type="text" name="dni-reg" required="" maxlength="30">
 								</div>
 		    				</div>
 		    				<div class="col-xs-12 col-sm-6">
@@ -136,24 +136,35 @@
 			                    </p>
 		    				</div>
 		    				<div class="col-xs-12 col-sm-6">
+
+		    					<?php if($_SESSION['privilegio_sbp']==1): ?>		    					
 								<div class="radio radio-primary">
 									<label>
-										<input type="radio" name="optionsPrivilegio" id="optionsRadios1" value="1">
+										<input type="radio" name="optionsPrivilegio" id="optionsRadios1" value="<?php echo $lc->encryption(1); ?>">
 										<i class="zmdi zmdi-star"></i> &nbsp; Nivel 1
 									</label>
 								</div>
+								<?php 
+									endif;
+									if($_SESSION['privilegio_sbp']<=2): 
+								  ?>
 								<div class="radio radio-primary">
 									<label>
-										<input type="radio" name="optionsPrivilegio" id="optionsRadios2" value="2">
+										<input type="radio" name="optionsPrivilegio" id="optionsRadios2" value="<?php echo $lc->encryption(2); ?>">
 										<i class="zmdi zmdi-star"></i> &nbsp; Nivel 2
 									</label>
 								</div>
+								<?php 
+									endif;
+								?>
 								<div class="radio radio-primary">
 									<label>
-										<input type="radio" name="optionsPrivilegio" id="optionsRadios3" value="3" checked="">
+										<input type="radio" name="optionsPrivilegio" id="optionsRadios3" value="<?php echo $lc->encryption(3); ?>" checked="">
 										<i class="zmdi zmdi-star"></i> &nbsp; Nivel 3
 									</label>
 								</div>
+
+
 		    				</div>
 		    			</div>
 		    		</div>

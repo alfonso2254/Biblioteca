@@ -33,7 +33,7 @@
 			return $sql;
 			}
 		protected function eliminar_cuenta($codigo){
-			$sql=self::conectar()->prepare("DELETE FROM cuenta WHERE cuentaCodigo:Codigo");
+			$sql=self::conectar()->prepare("DELETE FROM cuenta WHERE CuentaCodigo=:Codigo");
 			$sql->bindParam(":Codigo",$codigo);
 			$sql->execute();
 			return $sql;

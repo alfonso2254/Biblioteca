@@ -20,7 +20,9 @@
 			$password2=mainModel::limpiar_cadena($_POST['password2-reg']);
 			$email=mainModel::limpiar_cadena($_POST['email-reg']);
 			$genero=mainModel::limpiar_cadena($_POST['optionsGenero']);
-			$privilegio=mainModel::limpiar_cadena($_POST['optionsPrivilegio']);
+
+			$privilegio=mainModel::decryption($_POST['optionsPrivilegio']);
+			$privilegio=mainModel::limpiar_cadena($privilegio);
 
 			if ($genero=="Masculino") {
 				$foto="Male3Avatar.png";
@@ -28,88 +30,106 @@
 				$foto="Female3Avatar.png";
 			}
 
-			if ($password1!=$password2) {
+			if ($privilegio<1 || $privilegio>3) {
+				$alerta=[
+					"Alerta"=>"simple",
+					"Titulo"=>"Ocurrio Un Error Inesperado",
+					"Texto"=>"El nivel de privilegio que intenta asignar es incorrecto",
+					"Tipo"=>"error"
+				];
+			}else{
+				if ($password1!=$password2) {
 				$alerta=[
 					"Alerta"=>"simple",
 					"Titulo"=>"Ocurrio Un Error Inesperado",
 					"Texto"=>"Las contraseñas que acabas de ingresar no coincide, intente nuevamente",
 					"Tipo"=>"error"
 				];
-			} else {
-				$consulta1=mainModel::ejecutar_consulta_simple("SELECT AdminDNI FROM admin WHERE AdminDNI='$dni'");
-				if ($consulta1->rowCount()>=1) {
-					$alerta=[
-					"Alerta"=>"simple",
-					"Titulo"=>"Ocurrio Un Error Inesperado",
-					"Texto"=>"El DNI/CEDULA que acaba de ingresar ya se encuentra registrado en el sistema",
-					"Tipo"=>"error"
-				];
 				} else {
-					if ($email!="") {
-						$consulta2=mainModel::ejecutar_consulta_simple("SELECT CuentaEmail FROM cuenta WHERE cuentaEmail='$email'");
-						$ec=$consulta2->rowCount();
-					} else {
-						$ec=0;
-					}
-
-					if ($ec>=1) {
+					$consulta1=mainModel::ejecutar_consulta_simple("SELECT AdminDNI FROM admin WHERE AdminDNI='$dni'");
+					if ($consulta1->rowCount()>=1) {
 						$alerta=[
-							"Alerta"=>"simple",
-							"Titulo"=>"Ocurrio Un Error Inesperado",
-							"Texto"=>"El EMAIL que acaba de ingresar ya se encuentra registrado en el sistema",
-							"Tipo"=>"error"
-						];
+						"Alerta"=>"simple",
+						"Titulo"=>"Ocurrio Un Error Inesperado",
+						"Texto"=>"El DNI/CEDULA que acaba de ingresar ya se encuentra registrado en el sistema",
+						"Tipo"=>"error"
+					];
 					} else {
-						$consulta3=mainModel::ejecutar_consulta_simple("SELECT CuentaUsuario FROM cuenta WHERE cuentaUsuario='$usuario'");
-						if ($consulta3->rowCount()>=1) {
+						if ($email!="") {
+							$consulta2=mainModel::ejecutar_consulta_simple("SELECT CuentaEmail FROM cuenta WHERE cuentaEmail='$email'");
+							$ec=$consulta2->rowCount();
+						} else {
+							$ec=0;
+						}
+
+						if ($ec>=1) {
 							$alerta=[
 								"Alerta"=>"simple",
 								"Titulo"=>"Ocurrio Un Error Inesperado",
-								"Texto"=>"El Usuario que acaba de ingresar ya se encuentra registrado en el sistema",
+								"Texto"=>"El EMAIL que acaba de ingresar ya se encuentra registrado en el sistema",
 								"Tipo"=>"error"
 							];
 						} else {
-							$consulta4=mainModel::ejecutar_consulta_simple("SELECT id FROM cuenta");
-							$numero=($consulta4->rowCount())+1;
+							$consulta3=mainModel::ejecutar_consulta_simple("SELECT CuentaUsuario FROM cuenta WHERE cuentaUsuario='$usuario'");
+							if ($consulta3->rowCount()>=1) {
+								$alerta=[
+									"Alerta"=>"simple",
+									"Titulo"=>"Ocurrio Un Error Inesperado",
+									"Texto"=>"El Usuario que acaba de ingresar ya se encuentra registrado en el sistema",
+									"Tipo"=>"error"
+								];
+							} else {
+								$consulta4=mainModel::ejecutar_consulta_simple("SELECT id FROM cuenta");
+								$numero=($consulta4->rowCount())+1;
 
-							$codigo=mainModel::generar_codigo_aleatorio("AC",7,$numero);
+								$codigo=mainModel::generar_codigo_aleatorio("AC",7,$numero);
 
-							$clave=mainModel::encryption($password1);
+								$clave=mainModel::encryption($password1);
 
-							$dataAC=[
-								"Codigo"=>$codigo,
-								"Privilegio"=>$privilegio,
-								"Usuario"=>$usuario,
-								"Clave"=>$clave,
-								"Email"=>$email,
-								"Estado"=>"Activo",
-								"Tipo"=>"Administrador",
-								"Genero"=>$genero,
-								"Foto"=>$foto
-							];
-
-							$guardarCuenta=mainModel::agregar_cuenta($dataAC);
-
-							if ($guardarCuenta->rowCount()>=1) {
-								$dataAD=[
-									"DNI"=>$dni,
-									"Nombre"=>$nombre,
-									"Apellido"=>$apellido,
-									"Telefono"=>$telefono,
-									"Direccion"=>$direccion,
-									"Codigo"=>$codigo
+								$dataAC=[
+									"Codigo"=>$codigo,
+									"Privilegio"=>$privilegio,
+									"Usuario"=>$usuario,
+									"Clave"=>$clave,
+									"Email"=>$email,
+									"Estado"=>"Activo",
+									"Tipo"=>"Administrador",
+									"Genero"=>$genero,
+									"Foto"=>$foto
 								];
 
-								$guardarAdmin=administradorModelo::agregar_administrador_modelo($dataAD);
-								if ($guardarAdmin->rowCount()>=1) {
-									$alerta=[
-										"Alerta"=>"limpiar",
-										"Titulo"=>"Administrador registrado",
-										"Texto"=>"El administrador se registro con exito en el sistema",
-										"Tipo"=>"success"
+								$guardarCuenta=mainModel::agregar_cuenta($dataAC);
+
+								if ($guardarCuenta->rowCount()>=1) {
+									$dataAD=[
+										"DNI"=>$dni,
+										"Nombre"=>$nombre,
+										"Apellido"=>$apellido,
+										"Telefono"=>$telefono,
+										"Direccion"=>$direccion,
+										"Codigo"=>$codigo
 									];
+
+									$guardarAdmin=administradorModelo::agregar_administrador_modelo($dataAD);
+									if ($guardarAdmin->rowCount()>=1) {
+										$alerta=[
+											"Alerta"=>"limpiar",
+											"Titulo"=>"Administrador registrado",
+											"Texto"=>"El administrador se registro con exito en el sistema",
+											"Tipo"=>"success"
+										];
+									} else {
+										mainModel::eliminar_cuenta($codigo);
+										$alerta=[
+											"Alerta"=>"simple",
+											"Titulo"=>"Ocurrio Un Error Inesperado",
+											"Texto"=>"No hemos podido registrar al administrador",
+											"Tipo"=>"error"
+										];
+									}
+									
+
 								} else {
-									mainModel::eliminar_cuenta($codigo);
 									$alerta=[
 										"Alerta"=>"simple",
 										"Titulo"=>"Ocurrio Un Error Inesperado",
@@ -118,46 +138,52 @@
 									];
 								}
 								
-
-							} else {
-								$alerta=[
-									"Alerta"=>"simple",
-									"Titulo"=>"Ocurrio Un Error Inesperado",
-									"Texto"=>"No hemos podido registrar al administrador",
-									"Tipo"=>"error"
-								];
 							}
 							
 						}
 						
+						
 					}
 					
-					
 				}
-				
 			}
+
+			
 			return mainModel::sweet_alert($alerta);	
 			
 		}
 
 		//Controlador para paginar adminiistradores
 
-		public function paginador_administrador_controlador($pagina,$registros,$privilegios,$codigo){
+		public function paginador_administrador_controlador($pagina,$registros,$privilegios,$codigo,$busqueda){
 
 			$pagina=mainModel::limpiar_cadena($pagina);
 			$registros=mainModel::limpiar_cadena($registros);
 			$privilegios=mainModel::limpiar_cadena($privilegios);
 			$codigo=mainModel::limpiar_cadena($codigo);
+			$busqueda=mainModel::limpiar_cadena($busqueda);
+
 			$tabla="";
 
 			$pagina= (isset($pagina) && $pagina>0) ? (int) $pagina :1;
 			$inicio= ($pagina>0) ? (($pagina*$registros)-$registros): 0;
 
+			if (isset($busqueda) && $busqueda!="") {
+					$consulta="
+					SELECT SQL_CALC_FOUND_ROWS * FROM admin WHERE (( CuentaCodigo!='$codigo' AND id!='1') AND (AdminNombre LIKE '%$busqueda%' OR AdminApellido LIKE '%$busqueda%' OR AdminTelefono LIKE '%$busqueda%' OR AdminDNI LIKE '%$busqueda%')) ORDER BY AdminNombre ASC LIMIT $inicio,$registros
+					";
+
+					$paginaurl="adminsearch";
+			}else{
+				$consulta="
+				SELECT SQL_CALC_FOUND_ROWS * FROM admin WHERE CuentaCodigo!='$codigo' AND id!='1' ORDER BY AdminNombre ASC LIMIT $inicio,$registros
+				";
+				$paginaurl="adminlist";
+			}
+
 			$conexion = mainModel::conectar();
 
-			$datos = $conexion->query("
-				SELECT SQL_CALC_FOUND_ROWS * FROM admin WHERE CuentaCodigo!='$codigo' AND id!='1' ORDER BY AdminNombre ASC LIMIT $inicio,$registros
-				");
+			$datos = $conexion->query($consulta);
 			$datos = $datos->fetchAll();
 
 			$total =$conexion->query("SELECT FOUND_ROWS()");
@@ -223,10 +249,17 @@
 						if ($privilegios==1) {
 							$tabla.='
 								<td>
-									<form>
+									<form action="'.SERVERURL.'ajax/administradorAjax.php" method="POST" class="FormularioAjax" data-form="delete" entype="multipart/form-data" autocomplete="off">
+
+										<input type="hidden" name="codigo-del" value="'.mainModel::encryption($rows['CuentaCodigo']).'">
+
+										<input type="hidden" name="privilegio-admin" value="'.mainModel::encryption($privilegios).'">
+
 										<button type="submit" class="btn btn-danger btn-raised btn-xs">
 											<i class="zmdi zmdi-delete"></i>
 										</button>
+
+										<div class="RespuestaAjax"></div>
 									</form>
 								</td>';
 						}
@@ -240,7 +273,7 @@
 					$tabla.= '
 					<tr>
 						<td colspan="5">
-							<a href="'.SERVERURL.'adminlist/" class="btn btn-sm btn-info btn-raised">
+							<a href="'.SERVERURL.$paginaurl.'/" class="btn btn-sm btn-info btn-raised">
 								Haga click aca para recargar el listado
 							</a>
 						</td>
@@ -268,27 +301,85 @@
 				if ($pagina==1) {
 					$tabla.= '<li class="disabled"><a><i class="zmdi zmdi-arrow-left"></i></a></li>';
 				}else{
-					$tabla.= '<li><a href="'.SERVERURL.'adminlist/'.($pagina-1).'"><i class="zmdi zmdi-arrow-left"></i></a></li>';
+					$tabla.= '<li><a href="'.SERVERURL.$paginaurl.'/'.($pagina-1).'"><i class="zmdi zmdi-arrow-left"></i></a></li>';
 				}
 
 					for($i=1; $i<=$Npaginas; $i++) {
 						if ($pagina==$i) {
-							$tabla.= '<li class="active"><a href="'.SERVERURL.'adminlist/'.$i.'">'.$i.'</a></li>';
+							$tabla.= '<li class="active"><a href="'.SERVERURL.$paginaurl.'/'.$i.'">'.$i.'</a></li>';
 						}else{
-							$tabla.= '<li><a href="'.SERVERURL.'adminlist/'.$i.'">'.$i.'</a></li>';
+							$tabla.= '<li><a href="'.SERVERURL.$paginaurl.'/'.$i.'">'.$i.'</a></li>';
 						}
 					}
 
 				if ($pagina==$Npaginas) {
 					$tabla.= '<li class="disabled"><a><i class="zmdi zmdi-arrow-right"></i></a></li>';
 				}else{
-					$tabla.= '<li><a href="'.SERVERURL.'adminlist/'.($pagina+1).'"><i class="zmdi zmdi-arrow-right"></i></a></li>';
+					$tabla.= '<li><a href="'.SERVERURL.$paginaurl.'/'.($pagina+1).'"><i class="zmdi zmdi-arrow-right"></i></a></li>';
 				}
 
 
 				$tabla.= '</ul></nav>';
 			}
 			return $tabla;
+		}
+
+
+		public function eliminar_administrador_controlador(){
+			$codigo=mainModel::decryption($_POST['codigo-del']);
+			$adminPrivilegio=mainModel::decryption($_POST['privilegio-admin']);
+
+			$codigo=mainModel::limpiar_cadena($codigo);
+			$adminPrivilegio=mainModel::limpiar_cadena($adminPrivilegio);
+
+			if ($adminPrivilegio==1) {
+				$query1=mainModel::ejecutar_consulta_simple("SELECT id FROM admin WHERE CuentaCodigo='$codigo'");
+				$datosAdmin=$query1->fetch();
+				if ($datosAdmin['id']!=1) {
+					$DelAdmin=administradorModelo::eliminar_administrador_modelo($codigo);
+					mainModel::eliminar_bitacora($codigo);
+					if ($DelAdmin->rowCount()>=1) {
+							$DelCuenta=mainModel::eliminar_cuenta($codigo);
+							if ($DelCuenta->rowCount()>=1) {
+								$alerta=[
+									"Alerta"=>"recargar",
+									"Titulo"=>"Administrador eliminado",
+									"Texto"=>"El administrador fue eliminado con exito del sistema",
+									"Tipo"=>"success"
+								];
+							}else{
+								$alerta=[
+									"Alerta"=>"simple",
+									"Titulo"=>"Ocurrio Un Error Inesperado",
+									"Texto"=>"aaaaNo podemos eliminar esta cuenta en este momento",
+									"Tipo"=>"error"
+								];
+							}
+					}else{
+						$alerta=[
+						"Alerta"=>"simple",
+						"Titulo"=>"Ocurrio Un Error Inesperado",
+						"Texto"=>"No podemos eliminar este administrador en este momento",
+						"Tipo"=>"error"
+					];
+					}
+				}else{
+					$alerta=[
+						"Alerta"=>"simple",
+						"Titulo"=>"Ocurrio Un Error Inesperado",
+						"Texto"=>"No podemos eliminar el administrador del sistema",
+						"Tipo"=>"error"
+					];
+				}
+			}else{
+				$alerta=[
+					"Alerta"=>"simple",
+					"Titulo"=>"Ocurrio Un Error Inesperado",
+					"Texto"=>"Tu no tienes los permisos necesarios para realizar esta operacion",
+					"Tipo"=>"error"
+				];
+			}
+			return mainModel::sweet_alert($alerta);	
 		}
 	}
 	
