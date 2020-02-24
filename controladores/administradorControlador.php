@@ -175,11 +175,23 @@
 							<th class="text-center">DNI</th>
 							<th class="text-center">NOMBRES</th>
 							<th class="text-center">APELLIDOS</th>
-							<th class="text-center">TELÉFONO</th>
-							<th class="text-center">A. CUENTA</th>
-							<th class="text-center">A. DATOS</th>
-							<th class="text-center">ELIMINAR</th>
-						</tr>
+							<th class="text-center">TELÉFONO</th>';
+						if ($privilegios<=2) {
+							$tabla.= '
+								<th class="text-center">A. CUENTA</th>
+								<th class="text-center">A. DATOS</th>
+							';
+						}
+						if($privilegios==1){
+							$tabla.= '
+								<th class="text-center">ELIMINAR</th>
+							';
+						}
+						
+							
+							
+
+			$tabla.= '</tr>
 					</thead>
 					<tbody>
 			';
@@ -193,39 +205,89 @@
 						<td>'.$rows['AdminDNI'] .'</td>
 						<td>'.$rows['AdminNombre'] .'</td>
 						<td>'.$rows['AdminApellido'] .'</td>
-						<td>'.$rows['AdminTelefono'] .'</td>
+						<td>'.$rows['AdminTelefono'] .'</td>';
+						if ($privilegios<=2) {
+							$tabla.='
 						<td>
-							<a href="#!" class="btn btn-success btn-raised btn-xs">
+							<a href="'.SERVERURL.'myaccount/admin/'.mainModel::encryption($rows['CuentaCodigo']).'/" class="btn btn-success btn-raised btn-xs">
 								<i class="zmdi zmdi-refresh"></i>
 							</a>
 						</td>
 						<td>
-							<a href="#!" class="btn btn-success btn-raised btn-xs">
+							<a href="'.SERVERURL.'mydata/admin/'.mainModel::encryption($rows['CuentaCodigo']).'/" class="btn btn-success btn-raised btn-xs">
 								<i class="zmdi zmdi-refresh"></i>
 							</a>
-						</td>
-						<td>
-							<form>
-								<button type="submit" class="btn btn-danger btn-raised btn-xs">
-									<i class="zmdi zmdi-delete"></i>
-								</button>
-							</form>
-						</td>
-					</tr>
-				';
+						</td>';
+
+						};
+						if ($privilegios==1) {
+							$tabla.='
+								<td>
+									<form>
+										<button type="submit" class="btn btn-danger btn-raised btn-xs">
+											<i class="zmdi zmdi-delete"></i>
+										</button>
+									</form>
+								</td>';
+						}
+					$tabla.='</tr>';
+					
+				
 				$contador++;
 				}
-			} else {
-				$tabla.= '
-					<tr colspan="5">
-						<td>No hay registros en el sistema</td>
+			}else{
+				if ($total>=1) {
+					$tabla.= '
+					<tr>
+						<td colspan="5">
+							<a href="'.SERVERURL.'adminlist/" class="btn btn-sm btn-info btn-raised">
+								Haga click aca para recargar el listado
+							</a>
+						</td>
 					</tr>
-				';
+					';
+				} else {
+					$tabla.= '
+					<tr>
+						<td colspan="5">No hay registros en el sistema</td>
+					</tr>
+					';
+				}
+				
+				
 			}
 			
 
 			$tabla.= '</tbody></table></div>';
 
+			if ($total>=1 && $pagina<=$Npaginas) {
+				$tabla.= '
+					<nav class="text-center">
+					<ul class="pagination pagination-sm">';
+
+				if ($pagina==1) {
+					$tabla.= '<li class="disabled"><a><i class="zmdi zmdi-arrow-left"></i></a></li>';
+				}else{
+					$tabla.= '<li><a href="'.SERVERURL.'adminlist/'.($pagina-1).'"><i class="zmdi zmdi-arrow-left"></i></a></li>';
+				}
+
+					for($i=1; $i<=$Npaginas; $i++) {
+						if ($pagina==$i) {
+							$tabla.= '<li class="active"><a href="'.SERVERURL.'adminlist/'.$i.'">'.$i.'</a></li>';
+						}else{
+							$tabla.= '<li><a href="'.SERVERURL.'adminlist/'.$i.'">'.$i.'</a></li>';
+						}
+					}
+
+				if ($pagina==$Npaginas) {
+					$tabla.= '<li class="disabled"><a><i class="zmdi zmdi-arrow-right"></i></a></li>';
+				}else{
+					$tabla.= '<li><a href="'.SERVERURL.'adminlist/'.($pagina+1).'"><i class="zmdi zmdi-arrow-right"></i></a></li>';
+				}
+
+
+				$tabla.= '</ul></nav>';
+			}
 			return $tabla;
 		}
 	}
